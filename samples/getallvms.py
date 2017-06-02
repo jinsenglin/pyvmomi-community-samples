@@ -18,6 +18,7 @@
 Python program for listing the vms on an ESX / vCenter host
 """
 
+import ssl
 import atexit
 
 from pyVim import connect
@@ -26,6 +27,8 @@ from pyVmomi import vim
 
 import tools.cli as cli
 
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+context.verify_mode = ssl.CERT_NONE
 
 def print_vm_info(virtual_machine):
     """
@@ -71,12 +74,14 @@ def main():
             service_instance = connect.SmartConnectNoSSL(host=args.host,
                                                          user=args.user,
                                                          pwd=args.password,
-                                                         port=int(args.port))
+                                                         port=int(args.port),
+                                                         sslContext=context)
         else:
             service_instance = connect.SmartConnect(host=args.host,
                                                     user=args.user,
                                                     pwd=args.password,
-                                                    port=int(args.port))
+                                                    port=int(args.port),
+                                                    sslContext=context)
 
         atexit.register(connect.Disconnect, service_instance)
 
